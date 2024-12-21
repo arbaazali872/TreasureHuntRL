@@ -3,7 +3,7 @@ from gym import spaces
 import numpy as np
 from logger_setup import setup_logger
 
-logger = setup_logger('GameEnvironment', 'game_env.log')
+logger = setup_logger('GameEnvironment', 'game_env_tuned9.log')
 class GameEnvironment(gym.Env):
     def __init__(self):
         super(GameEnvironment, self).__init__()
@@ -24,10 +24,13 @@ class GameEnvironment(gym.Env):
 
     def reset(self):
         """Resets the game environment."""
-        self.agent_pos = np.random.randint(0, self.grid_size, size=(2,))
-        self.treasure_pos = np.random.randint(0, self.grid_size, size=(2,))
-        self.monster_positions = self._generate_monsters()
+        # Generate distinct positions for agent and treasure
+        self.agent_pos = self._generate_unique_position([])
+        self.treasure_pos = self._generate_unique_position([self.agent_pos])
         
+        # Generate distinct positions for monsters
+        self.monster_positions = self._generate_monsters()
+
         # Initialize proximity tracking
         self.previous_distance_to_treasure = np.linalg.norm(self.agent_pos - self.treasure_pos)
 
@@ -105,10 +108,25 @@ class GameEnvironment(gym.Env):
         return False
 
     def _generate_monsters(self):
-        """Generates exactly 3 monster positions."""
-        num_monsters = 3  # Restrict number of monsters to 3
+        """Generates exactly 3 monster positions ensuring no overlap."""
+        num_monsters = 3
         logger.info(f"Number of monsters: {num_monsters}")
-        return [np.random.randint(0, self.grid_size, size=(2,)) for _ in range(num_monsters)]
+        positions = []
+        for _ in range(num_monsters):
+            position = self._generate_unique_position(positions + [self.agent_pos, self.treasure_pos])
+            positions.append(position)
+        return positions
+    
+    def _generate_unique_position(self, occupied_positions):
+        """
+        Generates a unique position on the grid that does not overlap with
+        any positions in the occupied_positions list.
+        """
+        while True:
+            position = np.random.randint(0, self.grid_size, size=(2,))
+            if not any(np.array_equal(position, occupied) for occupied in occupied_positions):
+                return position
+
 
     def _get_state(self):
         """Returns the current state: agent position, treasure position, and 3 monster positions."""
