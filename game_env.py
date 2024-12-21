@@ -35,6 +35,7 @@ class GameEnvironment(gym.Env):
     def step(self, action):
         """Executes a move based on the action."""
         self._move_agent(action)
+        self._move_monsters()  # New: Move monsters after the agent moves
         reward, done = self._check_game_state()
         return self._get_state(), reward, done, {}
 
@@ -52,6 +53,24 @@ class GameEnvironment(gym.Env):
         
         print(f"Agent moved from {old_pos} to {self.agent_pos} with action {action}")
 
+    def _move_monsters(self):
+        """Moves each monster in a random direction."""
+        for i, monster_pos in enumerate(self.monster_positions):
+            direction = np.random.choice([0, 1, 2, 3])  # Randomly choose a direction
+            old_monster_pos = monster_pos.copy()
+
+            # Move monsters in the same grid as the agent
+            if direction == 0:  # Up
+                monster_pos[1] = max(0, monster_pos[1] - 1)
+            elif direction == 1:  # Down
+                monster_pos[1] = min(self.grid_size - 1, monster_pos[1] + 1)
+            elif direction == 2:  # Left
+                monster_pos[0] = max(0, monster_pos[0] - 1)
+            elif direction == 3:  # Right
+                monster_pos[0] = min(self.grid_size - 1, monster_pos[0] + 1)
+
+            print(f"Monster {i+1} moved from {old_monster_pos} to {monster_pos}")
+
     def _check_game_state(self):
         """Checks if the game is won or lost."""
         if np.array_equal(self.agent_pos, self.treasure_pos):
@@ -67,16 +86,16 @@ class GameEnvironment(gym.Env):
         for monster_pos in self.monster_positions:
             dist = np.linalg.norm(self.agent_pos - monster_pos)
             print(f"Distance to monster at {monster_pos}: {dist}")
-            if dist <= 1:
+            if dist <= 1:  # Adjacent or on the same position
                 return True
         return False
 
     def _generate_monsters(self):
         """Generates monster positions."""
         num_monsters = np.random.randint(1, 5)  # Random number of monsters
+        print("number of monsters: ",num_monsters)
         return [np.random.randint(0, self.grid_size, size=(2,)) for _ in range(num_monsters)]
 
     def _get_state(self):
         """Returns the current state."""
         return np.concatenate((self.agent_pos, self.treasure_pos))
-
