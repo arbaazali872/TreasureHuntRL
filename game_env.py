@@ -28,6 +28,9 @@ class GameEnvironment(gym.Env):
         self.treasure_pos = np.random.randint(0, self.grid_size, size=(2,))
         self.monster_positions = self._generate_monsters()
         
+        # Initialize proximity tracking
+        self.previous_distance_to_treasure = np.linalg.norm(self.agent_pos - self.treasure_pos)
+
         logger.info(f"Agent starting position: {self.agent_pos}")
         logger.info(f"Treasure position: {self.treasure_pos}")
         logger.info(f"Monster positions: {self.monster_positions}")
@@ -73,15 +76,24 @@ class GameEnvironment(gym.Env):
 
             logger.debug(f"Monster {i+1} moved from {old_monster_pos} to {monster_pos}")
 
+    # def _check_game_state(self):
     def _check_game_state(self):
-        """Checks if the game is won or lost."""
+        """Checks if the game is won or lost and returns the appropriate reward."""
         if np.array_equal(self.agent_pos, self.treasure_pos):
             logger.info("Agent reached the treasure!")
             return 10, True  # Win
         elif self._is_adjacent_to_monster():
             logger.info("Agent is adjacent to a monster!")
-            return -10, True  # Lose
-        return -1, False  # Step penalty
+            return -20, True  # Increased penalty for losing
+        else:
+            # Introduce proximity-based rewards and penalties
+            distance_to_treasure = np.linalg.norm(self.agent_pos - self.treasure_pos)
+            reward = -1  # Step penalty
+            # Reward for moving closer to the treasure
+            if distance_to_treasure < self.previous_distance_to_treasure:
+                reward += 1
+            self.previous_distance_to_treasure = distance_to_treasure
+            return reward, False
 
     def _is_adjacent_to_monster(self):
         """Checks if the agent is adjacent to any monster."""
