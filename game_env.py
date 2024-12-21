@@ -12,9 +12,9 @@ class GameEnvironment(gym.Env):
         # Define action space (up, down, left, right)
         self.action_space = spaces.Discrete(4)
         
-        # Observation space (agent's position + treasure + monsters)
+        # Observation space (agent's position + treasure + 3 monsters)
         self.observation_space = spaces.Box(
-            low=0, high=self.grid_size - 1, shape=(3,), dtype=np.int32
+            low=0, high=self.grid_size - 1, shape=(10,), dtype=np.int32
         )
         
         # Initialize game state
@@ -91,11 +91,11 @@ class GameEnvironment(gym.Env):
         return False
 
     def _generate_monsters(self):
-        """Generates monster positions."""
-        num_monsters = np.random.randint(1, 5)  # Random number of monsters
-        print("number of monsters: ",num_monsters)
+        """Generates exactly 3 monster positions."""
+        num_monsters = 3  # Restrict number of monsters to 3
+        print(f"Number of monsters: {num_monsters}")
         return [np.random.randint(0, self.grid_size, size=(2,)) for _ in range(num_monsters)]
 
     def _get_state(self):
-        """Returns the current state."""
-        return np.concatenate((self.agent_pos, self.treasure_pos))
+        """Returns the current state: agent position, treasure position, and 3 monster positions."""
+        return np.concatenate((self.agent_pos, self.treasure_pos, *self.monster_positions))
