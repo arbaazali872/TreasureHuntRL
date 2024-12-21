@@ -3,7 +3,7 @@ from gym import spaces
 import numpy as np
 from logger_setup import setup_logger
 
-logger = setup_logger('GameEnvironment', 'game_env_tuned9.log')
+logger = setup_logger('GameEnvironment', 'game_env_tuned.log')
 class GameEnvironment(gym.Env):
     def __init__(self):
         super(GameEnvironment, self).__init__()
@@ -24,10 +24,16 @@ class GameEnvironment(gym.Env):
 
     def reset(self):
         """Resets the game environment."""
-        # Generate distinct positions for agent and treasure
-        self.agent_pos = self._generate_unique_position([])
-        self.treasure_pos = self._generate_unique_position([self.agent_pos])
-        
+        while True:
+            # Generate agent and treasure positions
+            self.agent_pos = self._generate_unique_position([])
+            self.treasure_pos = self._generate_unique_position([self.agent_pos])
+
+            # Check if the agent and treasure are far enough
+            distance = np.linalg.norm(self.agent_pos - self.treasure_pos)
+            if distance >= 5:  # Minimum distance constraint (e.g., 5 steps)
+                break
+
         # Generate distinct positions for monsters
         self.monster_positions = self._generate_monsters()
 
@@ -37,7 +43,7 @@ class GameEnvironment(gym.Env):
         logger.info(f"Agent starting position: {self.agent_pos}")
         logger.info(f"Treasure position: {self.treasure_pos}")
         logger.info(f"Monster positions: {self.monster_positions}")
-        
+
         return self._get_state()
 
     def step(self, action):
