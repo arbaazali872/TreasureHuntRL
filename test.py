@@ -10,16 +10,30 @@ logger = setup_logger('Test', 'test.log')
 env = GameEnvironment()
 
 # Initialize the RL model
-model = DQN('MlpPolicy', env, verbose=1)
+# model = DQN('MlpPolicy', env, verbose=1)
+model = DQN(
+    "MlpPolicy",
+    env,
+    learning_rate=0.0005,  # Slightly increased learning rate
+    gamma=0.95,  # Slightly reduced discount factor to prioritize short-term rewards
+    exploration_initial_eps=1.0,  # Start with full exploration
+    exploration_final_eps=0.1,  # End with more exploration than before
+    exploration_fraction=0.4,  # Slow down exploration decay
+    buffer_size=200000,  # Increase replay buffer size
+    batch_size=64,  # Increase batch size for more stable updates
+    train_freq=1,  # Update after every step
+    target_update_interval=5000,  # Update target network more frequently
+    verbose=1,  # Print training information
+)
 
 # Train the model
 logger.info("Training the model...")
-model.learn(total_timesteps=50000)
-model.save("dqn_treasure_hunter")
+model.learn(total_timesteps=100000)  # Increased total timesteps
+model.save("dqn_treasure_hunter_tuned")
 logger.info("Model training complete and saved.")
 
 # Load the trained RL model
-model = DQN.load("dqn_treasure_hunter")
+model = DQN.load("dqn_treasure_hunter_tuned")
 
 # Reset the environment and print the initial state
 state = env.reset()
