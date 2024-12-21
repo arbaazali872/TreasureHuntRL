@@ -1,11 +1,13 @@
 import gym
 from gym import spaces
 import numpy as np
+from logger_setup import setup_logger
 
+logger = setup_logger('GameEnvironment', 'game_env.log')
 class GameEnvironment(gym.Env):
     def __init__(self):
         super(GameEnvironment, self).__init__()
-        
+        logger.info("Initializing the game environment.")
         # Grid dimensions
         self.grid_size = 10
         
@@ -26,9 +28,9 @@ class GameEnvironment(gym.Env):
         self.treasure_pos = np.random.randint(0, self.grid_size, size=(2,))
         self.monster_positions = self._generate_monsters()
         
-        print(f"Agent starting position: {self.agent_pos}")
-        print(f"Treasure position: {self.treasure_pos}")
-        print(f"Monster positions: {self.monster_positions}")
+        logger.info(f"Agent starting position: {self.agent_pos}")
+        logger.info(f"Treasure position: {self.treasure_pos}")
+        logger.info(f"Monster positions: {self.monster_positions}")
         
         return self._get_state()
 
@@ -51,7 +53,7 @@ class GameEnvironment(gym.Env):
         elif action == 3:  # Right
             self.agent_pos[0] = min(self.grid_size - 1, self.agent_pos[0] + 1)
         
-        print(f"Agent moved from {old_pos} to {self.agent_pos} with action {action}")
+        logger.debug(f"Agent moved from {old_pos} to {self.agent_pos} with action {action}")
 
     def _move_monsters(self):
         """Moves each monster in a random direction."""
@@ -69,15 +71,15 @@ class GameEnvironment(gym.Env):
             elif direction == 3:  # Right
                 monster_pos[0] = min(self.grid_size - 1, monster_pos[0] + 1)
 
-            print(f"Monster {i+1} moved from {old_monster_pos} to {monster_pos}")
+            logger.debug(f"Monster {i+1} moved from {old_monster_pos} to {monster_pos}")
 
     def _check_game_state(self):
         """Checks if the game is won or lost."""
         if np.array_equal(self.agent_pos, self.treasure_pos):
-            print("Agent reached the treasure!")
+            logger.info("Agent reached the treasure!")
             return 10, True  # Win
         elif self._is_adjacent_to_monster():
-            print("Agent is adjacent to a monster!")
+            logger.info("Agent is adjacent to a monster!")
             return -10, True  # Lose
         return -1, False  # Step penalty
 
@@ -85,7 +87,7 @@ class GameEnvironment(gym.Env):
         """Checks if the agent is adjacent to any monster."""
         for monster_pos in self.monster_positions:
             dist = np.linalg.norm(self.agent_pos - monster_pos)
-            print(f"Distance to monster at {monster_pos}: {dist}")
+            logger.debug(f"Distance to monster at {monster_pos}: {dist}")
             if dist <= 1:  # Adjacent or on the same position
                 return True
         return False
@@ -93,7 +95,7 @@ class GameEnvironment(gym.Env):
     def _generate_monsters(self):
         """Generates exactly 3 monster positions."""
         num_monsters = 3  # Restrict number of monsters to 3
-        print(f"Number of monsters: {num_monsters}")
+        logger.info(f"Number of monsters: {num_monsters}")
         return [np.random.randint(0, self.grid_size, size=(2,)) for _ in range(num_monsters)]
 
     def _get_state(self):
