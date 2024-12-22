@@ -3,24 +3,30 @@ from gym import spaces
 import numpy as np
 from logger_setup import setup_logger
 
-logger = setup_logger('GameEnvironment', 'game_env_tuned.log')
+logger = setup_logger('GameEnvironment', 'game_env_2nd_tuned3.log')
+
 class GameEnvironment(gym.Env):
-    def __init__(self):
+    def __init__(self, grid_size=10, min_agent_treasure_distance=5, min_agent_monster_distance=3):
         super(GameEnvironment, self).__init__()
         logger.info("Initializing the game environment.")
+
         # Grid dimensions
-        self.grid_size = 10
-        
+        self.grid_size = grid_size
+
+        # Distance constraints
+        self.min_agent_treasure_distance = min_agent_treasure_distance
+        self.min_agent_monster_distance = min_agent_monster_distance
+
         # Define action space (up, down, left, right)
         self.action_space = spaces.Discrete(4)
-        
+
         # Observation space (agent's position + treasure + 3 monsters)
         self.observation_space = spaces.Box(
             low=0, high=self.grid_size - 1, shape=(10,), dtype=np.int32
         )
-        
+
         # Initialize game state
-        self.reset()
+        # self.reset()
 
     def reset(self):
         """Resets the game environment."""
@@ -29,16 +35,16 @@ class GameEnvironment(gym.Env):
             self.agent_pos = self._generate_unique_position([])
             self.treasure_pos = self._generate_unique_position([self.agent_pos])
 
-            # Check if the agent and treasure are far enough
-            distance = np.linalg.norm(self.agent_pos - self.treasure_pos)
-            if distance >= 5:  # Minimum distance constraint (e.g., 5 steps)
+            # Check if the agent and treasure are far enough (using Manhattan distance)
+            distance = self._manhattan_distance(self.agent_pos, self.treasure_pos)
+            if distance >= self.min_agent_treasure_distance:
                 break
 
         # Generate distinct positions for monsters
         self.monster_positions = self._generate_monsters()
 
         # Initialize proximity tracking
-        self.previous_distance_to_treasure = np.linalg.norm(self.agent_pos - self.treasure_pos)
+        self.previous_distance_to_treasure = self._manhattan_distance(self.agent_pos, self.treasure_pos)
 
         logger.info(f"Agent starting position: {self.agent_pos}")
         logger.info(f"Treasure position: {self.treasure_pos}")
@@ -49,7 +55,7 @@ class GameEnvironment(gym.Env):
     def step(self, action):
         """Executes a move based on the action."""
         self._move_agent(action)
-        self._move_monsters()  # New: Move monsters after the agent moves
+        self._move_monsters()
         reward, done = self._check_game_state()
         return self._get_state(), reward, done, {}
 
@@ -64,7 +70,7 @@ class GameEnvironment(gym.Env):
             self.agent_pos[0] = max(0, self.agent_pos[0] - 1)
         elif action == 3:  # Right
             self.agent_pos[0] = min(self.grid_size - 1, self.agent_pos[0] + 1)
-        
+
         logger.debug(f"Agent moved from {old_pos} to {self.agent_pos} with action {action}")
 
     def _move_monsters(self):
@@ -85,7 +91,6 @@ class GameEnvironment(gym.Env):
 
             logger.debug(f"Monster {i+1} moved from {old_monster_pos} to {monster_pos}")
 
-    # def _check_game_state(self):
     def _check_game_state(self):
         """Checks if the game is won or lost and returns the appropriate reward."""
         if np.array_equal(self.agent_pos, self.treasure_pos):
@@ -96,7 +101,7 @@ class GameEnvironment(gym.Env):
             return -20, True  # Increased penalty for losing
         else:
             # Introduce proximity-based rewards and penalties
-            distance_to_treasure = np.linalg.norm(self.agent_pos - self.treasure_pos)
+            distance_to_treasure = self._manhattan_distance(self.agent_pos, self.treasure_pos)
             reward = -1  # Step penalty
             # Reward for moving closer to the treasure
             if distance_to_treasure < self.previous_distance_to_treasure:
@@ -107,32 +112,38 @@ class GameEnvironment(gym.Env):
     def _is_adjacent_to_monster(self):
         """Checks if the agent is adjacent to any monster."""
         for monster_pos in self.monster_positions:
-            dist = np.linalg.norm(self.agent_pos - monster_pos)
+            dist = self._manhattan_distance(self.agent_pos, monster_pos)
             logger.debug(f"Distance to monster at {monster_pos}: {dist}")
             if dist <= 1:  # Adjacent or on the same position
                 return True
         return False
 
     def _generate_monsters(self):
-        """Generates exactly 3 monster positions ensuring no overlap."""
+        """Generates exactly 3 monster positions ensuring no overlap and minimum Manhattan distance from the agent."""
         num_monsters = 3
         logger.info(f"Number of monsters: {num_monsters}")
         positions = []
         for _ in range(num_monsters):
-            position = self._generate_unique_position(positions + [self.agent_pos, self.treasure_pos])
-            positions.append(position)
+            while True:
+                position = self._generate_unique_position(positions + [self.agent_pos, self.treasure_pos])
+                # Ensure the monster is at least `min_agent_monster_distance` Manhattan units away from the agent
+                if self._manhattan_distance(position, self.agent_pos) >= self.min_agent_monster_distance:
+                    positions.append(position)
+                    break
+                else:
+                    logger.debug(f"Retrying position for monster to meet Manhattan distance constraint.")
         return positions
-    
+
     def _generate_unique_position(self, occupied_positions):
-        """
-        Generates a unique position on the grid that does not overlap with
-        any positions in the occupied_positions list.
-        """
+        """Generates a unique position on the grid that does not overlap with any positions in the occupied_positions list."""
         while True:
             position = np.random.randint(0, self.grid_size, size=(2,))
             if not any(np.array_equal(position, occupied) for occupied in occupied_positions):
                 return position
 
+    def _manhattan_distance(self, pos1, pos2):
+        """Calculate Manhattan distance between two positions."""
+        return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
     def _get_state(self):
         """Returns the current state: agent position, treasure position, and 3 monster positions."""
