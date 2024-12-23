@@ -3,7 +3,7 @@ from gym import spaces
 import numpy as np
 from logger_setup import setup_logger
 
-logger = setup_logger('GameEnvironment', 'game_env_2nd_tuned3.log')
+logger = setup_logger('GameEnvironment', 'game_env_3rd_tuned_reward1.log')
 
 class GameEnvironment(gym.Env):
     def __init__(self, grid_size=10, min_agent_treasure_distance=5, min_agent_monster_distance=3):
@@ -54,9 +54,16 @@ class GameEnvironment(gym.Env):
 
     def step(self, action):
         """Executes a move based on the action."""
+        old_pos = self.agent_pos.copy()  # Store the agent's position before moving
         self._move_agent(action)
         self._move_monsters()
+        
+        # Penalize stagnation (agent staying in the same position)
         reward, done = self._check_game_state()
+        if np.array_equal(self.agent_pos, old_pos):  # Check if the agent's position hasn't changed
+            reward -= 2  # Penalize staying in place
+            logger.debug("Agent stayed in the same position, applying stagnation penalty.")
+        
         return self._get_state(), reward, done, {}
 
     def _move_agent(self, action):
@@ -93,21 +100,38 @@ class GameEnvironment(gym.Env):
 
     def _check_game_state(self):
         """Checks if the game is won or lost and returns the appropriate reward."""
+        old_pos = self.agent_pos.copy()
         if np.array_equal(self.agent_pos, self.treasure_pos):
             logger.info("Agent reached the treasure!")
-            return 10, True  # Win
+            return 50, True  # Larger reward for winning
         elif self._is_adjacent_to_monster():
             logger.info("Agent is adjacent to a monster!")
-            return -20, True  # Increased penalty for losing
+            return -20, True  # Penalty for losing
         else:
-            # Introduce proximity-based rewards and penalties
+            # Calculate proximity-based rewards and penalties
             distance_to_treasure = self._manhattan_distance(self.agent_pos, self.treasure_pos)
             reward = -1  # Step penalty
-            # Reward for moving closer to the treasure
+
+            # Reward or penalize based on distance to the treasure
             if distance_to_treasure < self.previous_distance_to_treasure:
-                reward += 1
+                reward += self.previous_distance_to_treasure - distance_to_treasure  # Reward for getting closer
+            elif distance_to_treasure > self.previous_distance_to_treasure:
+                reward -= distance_to_treasure - self.previous_distance_to_treasure  # Penalty for getting farther
+            
+            # Penalize proximity to monsters
+            for monster_pos in self.monster_positions:
+                distance_to_monster = self._manhattan_distance(self.agent_pos, monster_pos)
+                if distance_to_monster < 3:  # Within danger zone
+                    reward -= (3 - distance_to_monster) * 2  # Larger penalty for being closer
+
+            # Penalize stagnant behavior
+            if np.array_equal(self.agent_pos, old_pos):  # Check if the position didn't change
+                reward -= 2  # Penalize staying in place
+
+            # Update proximity tracking
             self.previous_distance_to_treasure = distance_to_treasure
             return reward, False
+
 
     def _is_adjacent_to_monster(self):
         """Checks if the agent is adjacent to any monster."""

@@ -4,10 +4,11 @@ import numpy as np
 from stable_baselines3 import DQN
 
 # Set up the logger for testing
-logger = setup_logger('Test', 'test.log')
+logger = setup_logger('Test', 'test_3rd_tuned_reward1.log')
 
 # Initialize the environment
 env = GameEnvironment()
+# env.reset()
 
 # Initialize the RL model
 # model = DQN('MlpPolicy', env, verbose=1)
@@ -28,12 +29,12 @@ model = DQN(
 
 # Train the model
 logger.info("Training the model...")
-model.learn(total_timesteps=100000)  # Increased total timesteps
-model.save("dqn_treasure_hunter_tuned")
+model.learn(total_timesteps=500000)  # Increased total timesteps
+model.save("dqn_treasure_hunter_3rd_tuned_reward")
 logger.info("Model training complete and saved.")
 
 # Load the trained RL model
-model = DQN.load("dqn_treasure_hunter_tuned")
+model = DQN.load("dqn_treasure_hunter_3rd_tuned_reward")
 
 # Reset the environment and print the initial state
 state = env.reset()
