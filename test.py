@@ -1,6 +1,8 @@
 from game_env import GameEnvironment  # Import your environment
 import numpy as np
 from stable_baselines3 import DQN  # Import the DQN model
+from evaluate import evaluate_model
+log_name = "stage_1c"
 
 # Initialize the environment
 env = GameEnvironment()
@@ -12,10 +14,10 @@ model = DQN('MlpPolicy', env, verbose=1)
 model.learn(total_timesteps=10000)
 
 # Save the trained model
-model.save("dqn_treasure_hunter")
+model.save(f"dqn_treasure_hunter_{log_name}")
 
 # Load the trained RL model
-model = DQN.load("dqn_treasure_hunter")
+model = DQN.load(f"dqn_treasure_hunter_{log_name}")
 
 # Reset the environment and print the initial state
 state = env.reset()
@@ -64,3 +66,10 @@ while not done:
 
 # Print the total reward accumulated in the episode
 print(f"Total reward for the episode: {total_reward}")
+
+# Evaluate the trained model
+metrics = evaluate_model(model, env, num_episodes=100, log_file=f"evaluation_{log_name}.json")
+
+# Print the evaluation results
+print("Evaluation Results:")
+print(metrics)
