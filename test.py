@@ -2,9 +2,12 @@ from logger_setup import setup_logger
 from game_env import GameEnvironment
 import numpy as np
 from stable_baselines3 import DQN
-
+from evaluate import evaluate_model
 # Set up the logger for testing
-logger = setup_logger('Test', 'test_3rd_tuned_reward1.log')
+
+log_name = "stage_3b"
+
+logger = setup_logger('Test', f'test_{log_name}.log')
 
 # Initialize the environment
 env = GameEnvironment()
@@ -30,11 +33,11 @@ model = DQN(
 # Train the model
 logger.info("Training the model...")
 model.learn(total_timesteps=500000)  # Increased total timesteps
-model.save("dqn_treasure_hunter_3rd_tuned_reward")
+model.save(f"dqn_treasure_hunter_{log_name}")
 logger.info("Model training complete and saved.")
 
 # Load the trained RL model
-model = DQN.load("dqn_treasure_hunter_3rd_tuned_reward")
+model = DQN.load(f"dqn_treasure_hunter_{log_name}")
 
 # Reset the environment and print the initial state
 state = env.reset()
@@ -81,3 +84,11 @@ while not done:
 
 # Print the total reward accumulated in the episode
 logger.info(f"Total reward for the episode: {total_reward}")
+
+
+# Evaluate the trained model
+metrics = evaluate_model(model, env, num_episodes=100, log_file=f"evaluation_{log_name}.json")
+
+# Print the evaluation results
+print("Evaluation Results:")
+print(metrics)
