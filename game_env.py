@@ -28,7 +28,7 @@ class GameEnvironment(gym.Env):
             min_agent_monster_distance (int): Minimum Manhattan distance between agent and monsters.
         """
         super(GameEnvironment, self).__init__()
-        self.logger = setup_logger('game_env', os.getenv('game_env_log_path', 'game_env.log'))
+        self.logger = setup_logger('game_env', os.getenv('game_env_log_path', 'logs/game_env.log'))
         self.logger.info("Initializing the game environment.")
         self.grid_size = grid_size
         self.min_agent_treasure_distance = min_agent_treasure_distance

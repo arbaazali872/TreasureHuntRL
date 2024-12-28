@@ -5,17 +5,20 @@ from dotenv import load_dotenv
 import numpy as np
 import os
 
-class test_game():
-
+class ModelHandler:
     def __init__(self, config_path="config.env"):
-        # Load environment variables
+        """
+        Initialize the model handler with the environment and logger.
+        """
         load_dotenv(config_path)
         self.env = GameEnvironment()
-        self.model_path = os.getenv('model_path', 'dqn_model.zip')  # Default path
-        self.logger = setup_logger('Test', os.getenv('test_log_path', 'test.log'))
+        self.model_path = os.getenv('model_path', 'models/dqn_model.zip')  # Default path
+        self.logger = setup_logger('Test', os.getenv('test_log_path', 'logs/test.log'))
 
-    def setup_model_params(self):
-        """Set up model parameters from environment variables."""
+    def setup_model(self):
+        """
+        Set up the DQN model using hyperparameters from environment variables.
+        """
         return DQN(
             "MlpPolicy",
             self.env,
@@ -32,24 +35,28 @@ class test_game():
         )
 
     def train_model(self, total_timesteps=None):
-        """Train the model."""
+        """
+        Train the model and save it to the specified path.
+        """
         if not total_timesteps:
-            total_timesteps = int(os.getenv('total_timesteps', 500000))
-        model = self.setup_model_params()
-        self.logger.info("Training the model...")
+            total_timesteps = int(os.getenv('total_timesteps', 1000))
+        model = self.setup_model()
+        self.logger.info("Starting model training...")
         model.learn(total_timesteps=total_timesteps)
         model.save(self.model_path)
         self.logger.info(f"Model training complete and saved at {self.model_path}")
 
     def test_model(self):
-        """Test the trained model."""
+        """
+        Test the trained model and log the results.
+        """
+        if not os.path.exists(self.model_path):
+            self.logger.error(f"Model file not found at {self.model_path}. Please train the model first.")
+            return
 
         model = DQN.load(self.model_path)
-
-        # Reset the environment and print the initial state
         state = self.env.reset()
         total_reward = 0
-        # Test the trained RL model
         done = False
         step = 0
         while not done:
@@ -85,7 +92,14 @@ class test_game():
         self.logger.info(f"Total reward for the episode: {total_reward}")
 
 if __name__ == "__main__":
-    test = test_game()
-    test.train_model()
-    test.test_model()
-        
+    handler = ModelHandler()
+    mode = os.getenv('mode')
+
+    if mode == 'train':
+        handler.train_model()
+    elif mode == 'test':
+        handler.test_model()
+    else:
+        print("No/invalid mode selected, script will both train and test the model now")
+        handler.train_model()
+        handler.test_model()
