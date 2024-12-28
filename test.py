@@ -1,83 +1,91 @@
 from logger_setup import setup_logger
 from game_env import GameEnvironment
-import numpy as np
 from stable_baselines3 import DQN
+from dotenv import load_dotenv
+import numpy as np
+import os
 
-# Set up the logger for testing
-logger = setup_logger('Test', 'test_3rd_tuned_reward1.log')
+class test_game():
 
-# Initialize the environment
-env = GameEnvironment()
-# env.reset()
+    def __init__(self, config_path="config.env"):
+        # Load environment variables
+        load_dotenv(config_path)
+        self.env = GameEnvironment()
+        self.model_path = os.getenv('model_path', 'dqn_model.zip')  # Default path
+        self.logger = setup_logger('Test', os.getenv('test_log_path', 'test.log'))
 
-# Initialize the RL model
-# model = DQN('MlpPolicy', env, verbose=1)
-model = DQN(
-    "MlpPolicy",
-    env,
-    learning_rate=0.0005,  # Slightly increased learning rate
-    gamma=0.95,  # Slightly reduced discount factor to prioritize short-term rewards
-    exploration_initial_eps=1.0,  # Start with full exploration
-    exploration_final_eps=0.1,  # End with more exploration than before
-    exploration_fraction=0.4,  # Slow down exploration decay
-    buffer_size=200000,  # Increase replay buffer size
-    batch_size=64,  # Increase batch size for more stable updates
-    train_freq=1,  # Update after every step
-    target_update_interval=5000,  # Update target network more frequently
-    verbose=1,  # Print training information
-)
+    def setup_model_params(self):
+        """Set up model parameters from environment variables."""
+        return DQN(
+            "MlpPolicy",
+            self.env,
+            learning_rate=float(os.getenv('learning_rate', 0.0005)),
+            gamma=float(os.getenv('gamma', 0.95)),
+            exploration_initial_eps=float(os.getenv('exploration_initial_eps', 1.0)),
+            exploration_final_eps=float(os.getenv('exploration_final_eps', 0.1)),
+            exploration_fraction=float(os.getenv('exploration_fraction', 0.4)),
+            buffer_size=int(os.getenv('buffer_size', 200000)),
+            batch_size=int(os.getenv('batch_size', 64)),
+            train_freq=int(os.getenv('train_freq', 1)),
+            target_update_interval=int(os.getenv('target_update_interval', 5000)),
+            verbose=int(os.getenv('verbose', 1)),
+        )
 
-# Train the model
-logger.info("Training the model...")
-model.learn(total_timesteps=500000)  # Increased total timesteps
-model.save("dqn_treasure_hunter_3rd_tuned_reward")
-logger.info("Model training complete and saved.")
+    def train_model(self, total_timesteps=None):
+        """Train the model."""
+        if not total_timesteps:
+            total_timesteps = int(os.getenv('total_timesteps', 500000))
+        model = self.setup_model_params()
+        self.logger.info("Training the model...")
+        model.learn(total_timesteps=total_timesteps)
+        model.save(self.model_path)
+        self.logger.info(f"Model training complete and saved at {self.model_path}")
 
-# Load the trained RL model
-model = DQN.load("dqn_treasure_hunter_3rd_tuned_reward")
+    def test_model(self):
+        """Test the trained model."""
 
-# Reset the environment and print the initial state
-state = env.reset()
-total_reward = 0
+        model = DQN.load(self.model_path)
 
-'''
-# Test random moves
-actions = [0, 1, 2, 3]  # Up, Down, Left, Right
-for i in range(20):  # Simulate 20 steps
-    action = env.action_space.sample()  # Random action
-    print(f"Step {i+1}:")
-'''
-# Test the trained RL model
-done = False
-step = 0
-while not done:
-    step += 1
-    action, _states = model.predict(state)  # Get the action from the trained model
-    
-    logger.info(f"Step {step}:")
-    logger.info(f"Agent's current position: {env.agent_pos}")
-    logger.info(f"Monster positions: {env.monster_positions}")
+        # Reset the environment and print the initial state
+        state = self.env.reset()
+        total_reward = 0
+        # Test the trained RL model
+        done = False
+        step = 0
+        while not done:
+            step += 1
+            action, _states = model.predict(state)  # Get the action from the trained model
+            
+            self.logger.info(f"Step {step}:")
+            self.logger.info(f"Agent's current position: {self.env.agent_pos}")
+            self.logger.info(f"Monster positions: {self.env.monster_positions}")
 
-    # Perform the action and get the new state
-    next_state, reward, done, info = env.step(action)
+            # Perform the action and get the new state
+            next_state, reward, done, info = self.env.step(action)
 
-    # Accumulate total reward
-    total_reward += reward
-    logger.info(f"Action: {action}, Reward: {reward}, Done: {done}")
+            # Accumulate total reward
+            total_reward += reward
+            self.logger.info(f"Action: {action}, Reward: {reward}, Done: {done}")
 
-    # Print the new positions and distance to monsters
-    logger.info(f"Agent's new position: {env.agent_pos}")
-    for monster_pos in env.monster_positions:
-        dist = np.linalg.norm(env.agent_pos - monster_pos)
-        logger.info(f"Distance to monster at {monster_pos}: {dist}")
-    
-    # Check if the game is over
-    if done:
-        if reward > 0:
-            logger.info("Agent reached the treasure!")
-        else:
-            logger.info("Agent lost to a monster!")
-        break
+            # Print the new positions and distance to monsters
+            self.logger.info(f"Agent's new position: {self.env.agent_pos}")
+            for monster_pos in self.env.monster_positions:
+                dist = np.linalg.norm(self.env.agent_pos - monster_pos)
+                self.logger.info(f"Distance to monster at {monster_pos}: {dist}")
+            
+            # Check if the game is over
+            if done:
+                if reward > 0:
+                    self.logger.info("Agent reached the treasure!")
+                else:
+                    self.logger.info("Agent lost to a monster!")
+                break
 
-# Print the total reward accumulated in the episode
-logger.info(f"Total reward for the episode: {total_reward}")
+        # Print the total reward accumulated in the episode
+        self.logger.info(f"Total reward for the episode: {total_reward}")
+
+if __name__ == "__main__":
+    test = test_game()
+    test.train_model()
+    test.test_model()
+        
