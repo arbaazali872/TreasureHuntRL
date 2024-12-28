@@ -4,7 +4,6 @@
 
 This project implements a reinforcement learning (RL) solution using the Q-Learning algorithm to navigate a 10x10 grid-based environment. The agent learns to reach a treasure while avoiding dynamic obstacles (monsters). The project employs the **Stable Baselines3** library for RL and adheres to object-oriented programming principles for clean and modular design.
 
----
 
 ## Installation
 
@@ -32,15 +31,13 @@ This project implements a reinforcement learning (RL) solution using the Q-Learn
     ```
 
 4. Create directories for saving logs and models:
-    ```python
-    import os
-    os.makedirs("models", exist_ok=True)
-    os.makedirs("logs", exist_ok=True)
+    ```bash
+    mkdir models
+    mkdir logs 
     ```
 
 5. Set up environment variables:
-    - Populate the `config.env` file in the root directory with your desired parameters
----
+    - Populate the `config.env` file in the root directory with your desired training parameters
 
 ## Running the Project
 
@@ -65,6 +62,4 @@ The `model_handler.py` file serves as the entry point for both training and test
 
 3. **Customizing Hyperparameters**:
     - Modify the hyperparameter values in the `.env` file before running the script to train with different configurations.
-
----
 
