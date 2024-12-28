@@ -42,10 +42,10 @@ This project implements a reinforcement learning (RL) solution using the Q-Learn
 ## Running the Project
 
 ### Using `model_handler.py`
-The `model_handler.py` file serves as the entry point for both training and testing the RL agent. The mode is selected by setting the `MODE` environment variable in the `.env` file. If no mode is selected, the script will both train and test the model.
+The `model_handler.py` file serves as the entry point for both training and testing the RL agent. The mode is selected by setting the `MODE` environment variable in the `config.env` file. If no mode is selected, the script will both train and test the model.
 
 1. **Training the Agent**:
-    - Set `MODE=train` in the `.env` file.
+    - Set `MODE=train` in the `config.env` file.
     - Run the script:
       ```bash
       python model_handler.py
@@ -53,7 +53,7 @@ The `model_handler.py` file serves as the entry point for both training and test
     - Trained models are saved in the `models/` directory.
 
 2. **Testing the Agent**:
-    - Set `MODE=test` in the `.env` file.
+    - Set `MODE=test` in the `config.env` file.
     - Run the script:
       ```bash
       python model_handler.py
@@ -61,5 +61,9 @@ The `model_handler.py` file serves as the entry point for both training and test
     - Performance metrics and logs are saved in the `logs/` directory.
 
 3. **Customizing Hyperparameters**:
-    - Modify the hyperparameter values in the `.env` file before running the script to train with different configurations.
+    - Modify the hyperparameter values in the `config.env` file before running the script to train with different configurations.
+    - Run the script:
+      ```bash
+      python hyperparameter_tester.py
+      ```
 
