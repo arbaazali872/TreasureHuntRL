@@ -61,12 +61,14 @@ The `model_handler.py` file serves as the entry point for both training and test
     - Performance metrics and logs are saved in the `logs/` directory.
 
 ### Using `hyperparameter_tester.py`
+Modify the hyperparameter values in the `config.env` file before running the script to train with different configurations.
 
-    - Modify the hyperparameter values in the `config.env` file before running the script to train with different configurations.
-    - Run the script:
-      ```bash
-      python hyperparameter_tester.py
-      ```
-    - Performance metrics are saved in the `metrices/` directory.
+- Run the script:
+    
+    ```bash
+    python hyperparameter_tester.py
+    ```
+
+- Performance metrics are saved in the `metrices/` directory.
 
 
