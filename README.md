@@ -34,6 +34,7 @@ This project implements a reinforcement learning (RL) solution using the Q-Learn
     ```bash
     mkdir models
     mkdir logs 
+    mkdir metrices
     ```
 
 5. Set up environment variables:
@@ -71,4 +72,4 @@ Modify the hyperparameter values in the `config.env` file before running the scr
 
 - Performance metrics are saved in the `metrices/` directory.
 
-
+**To read the whole project report [Click Here](https://drive.google.com/file/d/1p2NEh5vgCc4G6sPDBMinKrgSnWGy9SAP/view?usp=sharing)**
