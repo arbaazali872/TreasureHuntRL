@@ -6,9 +6,21 @@ import numpy as np
 import os
 
 class ModelHandler:
+    """
+    A handler class for managing the training and testing of a DQN model 
+    in the custom GameEnvironment.
+
+    Attributes:
+        env (GameEnvironment): The game environment for the agent.
+        model_path (str): Path to save or load the DQN model.
+        logger (Logger): Logger for logging training and testing activities.
+    """
     def __init__(self, config_path="config.env"):
         """
         Initialize the model handler with the environment and logger.
+
+        Args:
+            config_path (str): Path to the environment variable configuration file.
         """
         load_dotenv(config_path)
         self.env = GameEnvironment()
@@ -17,7 +29,10 @@ class ModelHandler:
 
     def setup_model(self):
         """
-        Set up the DQN model using hyperparameters from environment variables.
+        Set up the DQN model using hyperparameters loaded from environment variables.
+
+        Returns:
+            DQN: The initialized DQN model with specified hyperparameters.
         """
         return DQN(
             "MlpPolicy",
@@ -36,7 +51,12 @@ class ModelHandler:
 
     def train_model(self, total_timesteps=None):
         """
-        Train the model and save it to the specified path.
+        Train the DQN model and save it to the specified path.
+
+        Args:
+            total_timesteps (int, optional): The number of timesteps to train the model.
+                                             If not provided, it defaults to the value 
+                                             specified in the environment variables.
         """
         if not total_timesteps:
             total_timesteps = int(os.getenv('total_timesteps', 1000))
@@ -48,7 +68,12 @@ class ModelHandler:
 
     def test_model(self):
         """
-        Test the trained model and log the results.
+        Test the trained DQN model by running it in the environment.
+
+        Logs the agent's actions, rewards, and positions at each step, and reports 
+        the total reward accumulated during the episode.
+
+        If the model file does not exist, logs an error and skips testing.
         """
         if not os.path.exists(self.model_path):
             self.logger.error(f"Model file not found at {self.model_path}. Please train the model first.")
@@ -92,6 +117,14 @@ class ModelHandler:
         self.logger.info(f"Total reward for the episode: {total_reward}")
 
 if __name__ == "__main__":
+    """
+    Entry point for the script.
+
+    Mode can be specified using the 'mode' environment variable:
+        - 'train': Only trains the model.
+        - 'test': Only tests the model.
+        - Default: Both trains and tests the model.
+    """
     handler = ModelHandler()
     mode = os.getenv('mode')
 

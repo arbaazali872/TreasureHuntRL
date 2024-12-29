@@ -43,7 +43,15 @@ class GameEnvironment(gym.Env):
         )
 
     def reset(self):
-        """Reset the game environment and return the initial state."""
+        """
+        Reset the game environment to its initial state.
+
+        - Randomly places the agent, treasure, and monsters on the grid.
+        - Ensures the agent is at a sufficient distance from the treasure and monsters.
+
+        Returns:
+            np.ndarray: The initial state of the environment.
+        """
         while True:
             self.agent_pos = self._generate_unique_position([])
             self.treasure_pos = self._generate_unique_position([self.agent_pos])
@@ -62,7 +70,19 @@ class GameEnvironment(gym.Env):
         return self._get_state()
 
     def step(self, action):
-        """Executes a move based on the action."""
+        """
+        Perform an action in the environment and update the state.
+
+        Args:
+            action (int): The action to perform (0=up, 1=down, 2=left, 3=right).
+
+        Returns:
+            tuple:
+                - np.ndarray: The updated state of the environment.
+                - float: The reward for the action.
+                - bool: Whether the episode has ended (True/False).
+                - dict: Additional information (empty in this case).
+        """
         old_pos = self.agent_pos.copy()  # Store the agent's position before moving
         self._move_agent(action)
         self._move_monsters()
@@ -96,7 +116,17 @@ class GameEnvironment(gym.Env):
                 monster_pos[0] = min(self.grid_size - 1, monster_pos[0] + 1)
 
     def _evaluate_game_state(self, old_pos):
-        """Evaluate the current state of the game."""
+        """
+        Evaluate the current state of the game to check if the episode ends.
+
+        Args:
+            old_pos (np.ndarray): The agent's position before taking the current action.
+
+        Returns:
+            tuple:
+                - float: The reward for the current state.
+                - bool: Whether the episode has ended (True/False).
+        """
         if np.array_equal(self.agent_pos, self.treasure_pos):
             self.logger.info("Agent reached the treasure!")
             return WIN_REWARD, True
@@ -107,7 +137,19 @@ class GameEnvironment(gym.Env):
         return reward, False
 
     def _compute_reward(self, old_pos):
-        """Compute the reward for the current step."""
+        """
+        Calculate the reward for the agent's current step.
+
+        - Rewards the agent for moving closer to the treasure.
+        - Penalizes the agent for moving farther or staying stagnant.
+        - Additional penalties are applied for proximity to monsters.
+
+        Args:
+            old_pos (np.ndarray): The agent's position before the current move.
+
+        Returns:
+            float: The calculated reward for the step.
+        """
         reward = STEP_PENALTY
         distance_to_treasure = self._manhattan_distance(self.agent_pos, self.treasure_pos)
 
@@ -139,7 +181,15 @@ class GameEnvironment(gym.Env):
                 return True
         return False
     def _generate_monsters(self):
-        """Generate unique monster positions."""
+        """
+        Generate unique positions for monsters on the grid.
+
+        - Ensures monsters are sufficiently far from the agent and each other.
+        - Places 3 monsters by default.
+
+        Returns:
+            list[np.ndarray]: List of positions for all monsters.
+        """
         positions = []
         for _ in range(3):  # Three monsters
             while True:
@@ -150,7 +200,15 @@ class GameEnvironment(gym.Env):
         return positions
 
     def _generate_unique_position(self, occupied_positions: list[np.ndarray]) -> np.ndarray:
-        """Generate a unique position not in occupied positions."""
+        """
+        Generate a unique grid position that is not occupied.
+
+        Args:
+            occupied_positions (list[np.ndarray]): List of positions already occupied on the grid.
+
+        Returns:
+            np.ndarray: A unique position on the grid.
+        """
         while True:
             position = np.random.randint(0, self.grid_size, size=(2,))
             if not any(np.array_equal(position, occupied) for occupied in occupied_positions):
@@ -161,5 +219,12 @@ class GameEnvironment(gym.Env):
         return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
     def _get_state(self):
-        """Get the current state of the environment."""
+        """
+        Retrieve the current state of the environment.
+
+        - Combines the agent's position, treasure position, and monster positions into a single array.
+
+        Returns:
+            np.ndarray: The concatenated state representation of the environment.
+        """
         return np.concatenate((self.agent_pos, self.treasure_pos, *self.monster_positions))
