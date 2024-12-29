@@ -98,15 +98,41 @@ class GameEnvironment(gym.Env):
     def _move_monsters(self):
         """Move all monsters in random directions."""
         for i, monster_pos in enumerate(self.monster_positions):
-            direction = np.random.choice([0, 1, 2, 3])
-            if direction == 0:
-                monster_pos[1] = max(0, monster_pos[1] - 1)
-            elif direction == 1:
-                monster_pos[1] = min(self.grid_size - 1, monster_pos[1] + 1)
-            elif direction == 2:
-                monster_pos[0] = max(0, monster_pos[0] - 1)
-            elif direction == 3:
-                monster_pos[0] = min(self.grid_size - 1, monster_pos[0] + 1)
+            unique_direction = False
+            retries = 0  
+            max_retries = 10  
+            while not unique_direction and retries < max_retries:
+                new_monster_pos = monster_pos.copy()
+
+                # Randomly choose a direction
+                direction = np.random.choice([0, 1, 2, 3])
+                if direction == 0:  # Up
+                    new_monster_pos[1] = max(0, new_monster_pos[1] - 1)
+                elif direction == 1:  # Down
+                    new_monster_pos[1] = min(self.grid_size - 1, new_monster_pos[1] + 1)
+                elif direction == 2:  # Left
+                    new_monster_pos[0] = max(0, new_monster_pos[0] - 1)
+                elif direction == 3:  # Right
+                    new_monster_pos[0] = min(self.grid_size - 1, new_monster_pos[0] + 1)
+
+                # Check if the new position is unique
+                unique_direction = self._check_unique(new_monster_pos, monster_number=i)
+                retries += 1
+
+            if retries < max_retries:
+                # Update monster position only if a valid move was found
+                monster_pos[:] = new_monster_pos
+            else:
+                # If retries exceeded, log a warning (or take alternative action)
+                self.logger.warning(f"Monster {i} could not find a unique move after {max_retries} retries.")
+
+    def _check_unique(self, monster_pos, monster_number):
+        """Check if the monster's position is unique compared to previous monsters."""
+        for j in range(monster_number):
+            if np.array_equal(self.monster_positions[j], monster_pos):
+                return False
+        return True
+
 
     def _evaluate_game_state(self, old_pos):
         """
