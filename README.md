@@ -32,9 +32,7 @@ This project implements a reinforcement learning (RL) solution using the Q-Learn
 
 4. Create directories for saving logs and models:
     ```bash
-    mkdir models
-    mkdir logs 
-    mkdir metrices
+    mkdir models logs metrices     
     ```
 
 5. Set up environment variables:
@@ -62,7 +60,7 @@ The `model_handler.py` file serves as the entry point for both training and test
     - Performance metrics and logs are saved in the `logs/` directory.
 
 ### Using `hyperparameter_tester.py`
-Modify the hyperparameter values in the `config.env` file before running the script to train with different configurations.
+Modify the hyperparameter values in the `hyperparameters.json` file before running the script to train with different configurations.
 
 - Run the script:
     
@@ -72,4 +70,4 @@ Modify the hyperparameter values in the `config.env` file before running the scr
 
 - Performance metrics are saved in the `metrices/` directory.
 
-**To read the whole project report [Click Here](https://drive.google.com/file/d/1p2NEh5vgCc4G6sPDBMinKrgSnWGy9SAP/view?usp=sharing)**
+**To read the whole project report containing training parameters and agent's performances [Click Here](https://drive.google.com/file/d/1p2NEh5vgCc4G6sPDBMinKrgSnWGy9SAP/view?usp=sharing)**

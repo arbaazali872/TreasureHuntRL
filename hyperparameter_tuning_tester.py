@@ -4,30 +4,30 @@ from stable_baselines3 import DQN
 import os
 import json
 
-# Determine the current working directory and set up directories for metrics, logs, and models.
-current_dir = os.path.dirname(os.path.abspath(__file__))
-metrics_dir = os.path.join(current_dir, "metrices")
-logs_dir = os.path.join(current_dir, "logs")
-models_dir = os.path.join(current_dir, "models")
-os.makedirs(models_dir, exist_ok=True)
-os.makedirs(logs_dir, exist_ok=True)
-os.makedirs(metrics_dir, exist_ok=True)
 
 class HyperParamTester:
     """
     A class for testing multiple hyperparameter configurations for a DQN model 
     in a custom game environment.
 
-    Attributes:
+       Attributes:
         hyperparameter_configs (list): List of hyperparameter configurations.
         total_timesteps (int): Total number of timesteps for training.
         total_episodes (int): Total number of episodes for testing.
         metrics (dict): Dictionary to store metrics for each configuration.
         env (GameEnvironment): The game environment instance.
         logger (Logger): Logger for logging training and testing activities.
+
+    Class Attributes:
+        metrics_dir (str): Directory for saving metrics.
+        logs_dir (str): Directory for saving logs.
         models_dir (str): Directory for saving trained models.
         metrics_path (str): Path for saving the metrics as a JSON file.
     """
+    metrics_dir = "metrices"
+    logs_dir = "logs"
+    models_dir = "models"
+    metrics_path = os.path.join(metrics_dir, "training_metrics.json")
 
     def __init__(self, hyperparameter_configs, total_timesteps=500000, total_episodes=100):
         """
@@ -38,11 +38,9 @@ class HyperParamTester:
             total_timesteps (int): Total timesteps for training. Defaults to 500000.
             total_episodes (int): Total episodes for testing. Defaults to 100.
         """
-        self.logger = setup_logger('HyperParamTester', os.getenv('hyper_param_tester_log_path', 'logs/hyper_param_tester.log'))
+        self.logger = setup_logger('HyperParamTester', os.getenv('hyper_param_tester_log_path', f'{self.logs_dir}/hyper_param_tester.log'))
         self.env = GameEnvironment()
         self.hyperparameter_configs = hyperparameter_configs
-        self.models_dir = models_dir
-        self.metrics_path = os.path.join(metrics_dir, "training_metrics.json")
         self.total_episodes = total_episodes
         self.total_timesteps = total_timesteps
         self.metrics = {"config_id": [], "total_reward": [], "success_rate": [], "average_episode_length": []}

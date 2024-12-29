@@ -4,21 +4,14 @@ import numpy as np
 import gym
 import os
 
-# Constants with default values
-WIN_REWARD = int(os.getenv("WIN_REWARD", 50))
-LOSE_PENALTY = int(os.getenv("LOSE_PENALTY", -20))
-STEP_PENALTY = int(os.getenv("STEP_PENALTY", -1))
-DANGER_ZONE_DISTANCE = int(os.getenv("DANGER_ZONE_DISTANCE", 3))
-STAGNATION_PENALTY = int(os.getenv("STAGNATION_PENALTY", -2))
-
-print(f"WIN_REWARD: {WIN_REWARD}, LOSE_PENALTY: {LOSE_PENALTY}, STEP_PENALTY: {STEP_PENALTY}, "
-      f"DANGER_ZONE_DISTANCE: {DANGER_ZONE_DISTANCE}, STAGNATION_PENALTY: {STAGNATION_PENALTY}")
-
-
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.INFO)
 
 class GameEnvironment(gym.Env):
+    # Constants with default values
+    WIN_REWARD = int(os.getenv("WIN_REWARD", 50))
+    LOSE_PENALTY = int(os.getenv("LOSE_PENALTY", -20))
+    STEP_PENALTY = int(os.getenv("STEP_PENALTY", -1))
+    DANGER_ZONE_DISTANCE = int(os.getenv("DANGER_ZONE_DISTANCE", 3))
+    STAGNATION_PENALTY = int(os.getenv("STAGNATION_PENALTY", -2))
     def __init__(self, grid_size = 10, min_agent_treasure_distance = 5, min_agent_monster_distance = 3):
         """
         Initialize the game environment.
@@ -129,10 +122,10 @@ class GameEnvironment(gym.Env):
         """
         if np.array_equal(self.agent_pos, self.treasure_pos):
             self.logger.info("Agent reached the treasure!")
-            return WIN_REWARD, True
+            return self.WIN_REWARD, True
         if self._is_adjacent_to_monster():
             self.logger.info("Agent encountered a monster!")
-            return LOSE_PENALTY, True
+            return self.LOSE_PENALTY, True
         reward = self._compute_reward(old_pos)
         return reward, False
 
@@ -150,7 +143,7 @@ class GameEnvironment(gym.Env):
         Returns:
             float: The calculated reward for the step.
         """
-        reward = STEP_PENALTY
+        reward = self.STEP_PENALTY
         distance_to_treasure = self._manhattan_distance(self.agent_pos, self.treasure_pos)
 
         # Reward or penalize distance to treasure
@@ -162,12 +155,12 @@ class GameEnvironment(gym.Env):
         # Penalize proximity to monsters
         for monster_pos in self.monster_positions:
             distance_to_monster = self._manhattan_distance(self.agent_pos, monster_pos)
-            if distance_to_monster < DANGER_ZONE_DISTANCE:
-                reward -= (DANGER_ZONE_DISTANCE - distance_to_monster) * 2
+            if distance_to_monster < self.DANGER_ZONE_DISTANCE:
+                reward -= (self.DANGER_ZONE_DISTANCE - distance_to_monster) * 2
 
         # Penalize stagnant behavior
         if np.array_equal(self.agent_pos, old_pos):
-            reward += STAGNATION_PENALTY
+            reward += self.STAGNATION_PENALTY
 
         self.previous_distance_to_treasure = distance_to_treasure
         return reward
