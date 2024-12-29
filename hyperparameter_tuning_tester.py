@@ -58,33 +58,30 @@ class HyperParamTester:
         Returns:
             DQN: The trained DQN model.
         """
-        try:
-            # Initialize the RL model with the provided hyperparameters
-            model = DQN(
-                "MlpPolicy",
-                self.env,
-                learning_rate=config["learning_rate"],
-                gamma=config["gamma"],
-                exploration_initial_eps=config["exploration_initial_eps"],
-                exploration_final_eps=config["exploration_final_eps"],
-                exploration_fraction=config["exploration_fraction"],
-                buffer_size=config["buffer_size"],
-                batch_size=config["batch_size"],
-                target_update_interval=config["target_update_interval"],
-                verbose=1
-            )
+        # Initialize the RL model with the provided hyperparameters
+        model = DQN(
+            "MlpPolicy",
+            self.env,
+            learning_rate=config["learning_rate"],
+            gamma=config["gamma"],
+            exploration_initial_eps=config["exploration_initial_eps"],
+            exploration_final_eps=config["exploration_final_eps"],
+            exploration_fraction=config["exploration_fraction"],
+            buffer_size=config["buffer_size"],
+            batch_size=config["batch_size"],
+            target_update_interval=config["target_update_interval"],
+            verbose=1
+        )
 
-            self.logger.info(f"Training model {config_count + 1}...")
-            model.learn(total_timesteps=self.total_timesteps)
-            model_file_name = os.path.join(self.models_dir, f"dqn_treasure_hunter_config_{config_count + 1}.zip")
-            
-            # Save the trained model
-            model.save(model_file_name)
-            self.logger.info(f"Model saved to {model_file_name}")
-            return model
-        except Exception as e:
-            self.logger.error(f"Error during training for configuration {config_count + 1}: {e}")
-            raise
+        self.logger.info(f"Training model {config_count + 1}...")
+        model.learn(total_timesteps=self.total_timesteps)
+        model_file_name = os.path.join(self.models_dir, f"dqn_treasure_hunter_config_{config_count + 1}.zip")
+        
+        # Save the trained model
+        model.save(model_file_name)
+        self.logger.info(f"Model saved to {model_file_name}")
+        return model
+
 
     def test_model(self, model, config_count):
         """
@@ -97,43 +94,40 @@ class HyperParamTester:
         Returns:
             None
         """
-        try:
-            self.logger.info(f"Starting testing with configuration {config_count + 1}")
-            total_reward = 0
-            success_count = 0
-            sum_episode_length = 0
+        self.logger.info(f"Starting testing with configuration {config_count + 1}")
+        total_reward = 0
+        success_count = 0
+        sum_episode_length = 0
 
-            for episode in range(self.total_episodes):
-                state = self.env.reset()
-                episode_reward = 0
-                episode_length = 0
-                done = False
+        for episode in range(self.total_episodes):
+            state = self.env.reset()
+            episode_reward = 0
+            episode_length = 0
+            done = False
 
-                while not done:
-                    action, _states = model.predict(state)
-                    state, reward, done, _ = self.env.step(action)
-                    episode_reward += reward
-                    episode_length += 1
+            while not done:
+                action, _states = model.predict(state)
+                state, reward, done, _ = self.env.step(action)
+                episode_reward += reward
+                episode_length += 1
 
-                total_reward += episode_reward
-                sum_episode_length += episode_length
-                if reward > 0:  # Success if the agent reached the treasure
-                    success_count += 1
+            total_reward += episode_reward
+            sum_episode_length += episode_length
+            if reward > 0:  # Success if the agent reached the treasure
+                success_count += 1
 
-            avg_reward = total_reward / self.total_episodes
-            avg_episode_length = sum_episode_length / self.total_episodes
-            success_rate = success_count / self.total_episodes
+        avg_reward = total_reward / self.total_episodes
+        avg_episode_length = sum_episode_length / self.total_episodes
+        success_rate = success_count / self.total_episodes
 
-            self.logger.info(f"Configuration {config_count + 1}: Average Reward: {avg_reward}, Success Rate: {success_rate}, Average Episode Length: {avg_episode_length}")
+        self.logger.info(f"Configuration {config_count + 1}: Average Reward: {avg_reward}, Success Rate: {success_rate}, Average Episode Length: {avg_episode_length}")
 
-            # Save metrics
-            self.metrics["config_id"].append(config_count + 1)
-            self.metrics["total_reward"].append(avg_reward)
-            self.metrics["success_rate"].append(success_rate)
-            self.metrics["average_episode_length"].append(avg_episode_length)
-        except Exception as e:
-            self.logger.error(f"Error during testing for configuration {config_count + 1}: {e}")
-            raise
+        # Save metrics
+        self.metrics["config_id"].append(config_count + 1)
+        self.metrics["total_reward"].append(avg_reward)
+        self.metrics["success_rate"].append(success_rate)
+        self.metrics["average_episode_length"].append(avg_episode_length)
+
 
     def save_metrices(self):
         """
@@ -156,15 +150,11 @@ class HyperParamTester:
         - Test the model.
         - Record the results.
         """
-        try:
-            for config_count, config in enumerate(self.hyperparameter_configs):
-                self.logger.info(f"Starting training with configuration {config_count + 1}: {config}")
-                trained_model = self.train_model(config, config_count)
-                self.test_model(trained_model, config_count)
-            self.save_metrices()
-        except Exception as e:
-            self.logger.error(f"Error during execution: {e}")
-            raise
+        for config_count, config in enumerate(self.hyperparameter_configs):
+            self.logger.info(f"Starting training with configuration {config_count + 1}: {config}")
+            trained_model = self.train_model(config, config_count)
+            self.test_model(trained_model, config_count)
+        self.save_metrices()
 
 
 if __name__ == "__main__":

@@ -79,7 +79,11 @@ class ModelHandler:
             self.logger.error(f"Model file not found at {self.model_path}. Please train the model first.")
             return
 
-        model = DQN.load(self.model_path)
+        try:
+            model = DQN.load(self.model_path)
+        except Exception as e:
+            self.logger.error(f"Failed to load the model: {e}")
+            return
         state = self.env.reset()
         total_reward = 0
         done = False
