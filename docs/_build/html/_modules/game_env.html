@@ -77,23 +77,16 @@
 <span class="kn">import</span> <span class="nn">gym</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="c1"># Constants with default values</span>
-<span class="n">WIN_REWARD</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;WIN_REWARD&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span>
-<span class="n">LOSE_PENALTY</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LOSE_PENALTY&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">))</span>
-<span class="n">STEP_PENALTY</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;STEP_PENALTY&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">DANGER_ZONE_DISTANCE</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DANGER_ZONE_DISTANCE&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">STAGNATION_PENALTY</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;STAGNATION_PENALTY&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">))</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WIN_REWARD: </span><span class="si">{</span><span class="n">WIN_REWARD</span><span class="si">}</span><span class="s2">, LOSE_PENALTY: </span><span class="si">{</span><span class="n">LOSE_PENALTY</span><span class="si">}</span><span class="s2">, STEP_PENALTY: </span><span class="si">{</span><span class="n">STEP_PENALTY</span><span class="si">}</span><span class="s2">, &quot;</span>
-      <span class="sa">f</span><span class="s2">&quot;DANGER_ZONE_DISTANCE: </span><span class="si">{</span><span class="n">DANGER_ZONE_DISTANCE</span><span class="si">}</span><span class="s2">, STAGNATION_PENALTY: </span><span class="si">{</span><span class="n">STAGNATION_PENALTY</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-
-<span class="c1"># logger = logging.getLogger(__name__)</span>
-<span class="c1"># logger.setLevel(logging.INFO)</span>
 
 <div class="viewcode-block" id="GameEnvironment">
 <a class="viewcode-back" href="../game_env.html#game_env.GameEnvironment">[docs]</a>
 <span class="k">class</span> <span class="nc">GameEnvironment</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">):</span>
+    <span class="c1"># Constants with default values</span>
+    <span class="n">WIN_REWARD</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;WIN_REWARD&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span>
+    <span class="n">LOSE_PENALTY</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LOSE_PENALTY&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">))</span>
+    <span class="n">STEP_PENALTY</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;STEP_PENALTY&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">DANGER_ZONE_DISTANCE</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DANGER_ZONE_DISTANCE&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">STAGNATION_PENALTY</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;STAGNATION_PENALTY&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">))</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid_size</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">min_agent_treasure_distance</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">min_agent_monster_distance</span> <span class="o">=</span> <span class="mi">3</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the game environment.</span>
@@ -191,15 +184,44 @@
     <span class="k">def</span> <span class="nf">_move_monsters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Move all monsters in random directions.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">monster_pos</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">monster_positions</span><span class="p">):</span>
-            <span class="n">direction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">monster_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">monster_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">monster_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">monster_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">monster_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">monster_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="n">monster_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">monster_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
+            <span class="n">unique_direction</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">retries</span> <span class="o">=</span> <span class="mi">0</span>  
+            <span class="n">max_retries</span> <span class="o">=</span> <span class="mi">10</span>  
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">unique_direction</span> <span class="ow">and</span> <span class="n">retries</span> <span class="o">&lt;</span> <span class="n">max_retries</span><span class="p">:</span>
+                <span class="n">new_monster_pos</span> <span class="o">=</span> <span class="n">monster_pos</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+                <span class="c1"># Randomly choose a direction</span>
+                <span class="n">direction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Up</span>
+                    <span class="n">new_monster_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">new_monster_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Down</span>
+                    <span class="n">new_monster_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">new_monster_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># Left</span>
+                    <span class="n">new_monster_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">new_monster_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># Right</span>
+                    <span class="n">new_monster_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">new_monster_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+                <span class="c1"># Check if the new position is unique</span>
+                <span class="n">unique_direction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_unique</span><span class="p">(</span><span class="n">new_monster_pos</span><span class="p">,</span> <span class="n">monster_number</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">retries</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">retries</span> <span class="o">&lt;</span> <span class="n">max_retries</span><span class="p">:</span>
+                <span class="c1"># Update monster position only if a valid move was found</span>
+                <span class="n">monster_pos</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">new_monster_pos</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># If retries exceeded, log a warning (or take alternative action)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monster </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> could not find a unique move after </span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> retries.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GameEnvironment._check_unique">
+<a class="viewcode-back" href="../game_env.html#game_env.GameEnvironment._check_unique">[docs]</a>
+    <span class="k">def</span> <span class="nf">_check_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">monster_pos</span><span class="p">,</span> <span class="n">monster_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if the monster&#39;s position is unique compared to previous monsters.-- Edge case handled&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">monster_number</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">monster_positions</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">monster_pos</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
 
 
 <div class="viewcode-block" id="GameEnvironment._evaluate_game_state">
@@ -218,10 +240,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">treasure_pos</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Agent reached the treasure!&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">WIN_REWARD</span><span class="p">,</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">WIN_REWARD</span><span class="p">,</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_adjacent_to_monster</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Agent encountered a monster!&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">LOSE_PENALTY</span><span class="p">,</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">LOSE_PENALTY</span><span class="p">,</span> <span class="kc">True</span>
         <span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_reward</span><span class="p">(</span><span class="n">old_pos</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">reward</span><span class="p">,</span> <span class="kc">False</span></div>
 
@@ -242,7 +264,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The calculated reward for the step.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">reward</span> <span class="o">=</span> <span class="n">STEP_PENALTY</span>
+        <span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STEP_PENALTY</span>
         <span class="n">distance_to_treasure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_manhattan_distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">treasure_pos</span><span class="p">)</span>
 
         <span class="c1"># Reward or penalize distance to treasure</span>
@@ -254,12 +276,13 @@
         <span class="c1"># Penalize proximity to monsters</span>
         <span class="k">for</span> <span class="n">monster_pos</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">monster_positions</span><span class="p">:</span>
             <span class="n">distance_to_monster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_manhattan_distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_pos</span><span class="p">,</span> <span class="n">monster_pos</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">distance_to_monster</span> <span class="o">&lt;</span> <span class="n">DANGER_ZONE_DISTANCE</span><span class="p">:</span>
-                <span class="n">reward</span> <span class="o">-=</span> <span class="p">(</span><span class="n">DANGER_ZONE_DISTANCE</span> <span class="o">-</span> <span class="n">distance_to_monster</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+            <span class="k">if</span> <span class="n">distance_to_monster</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">DANGER_ZONE_DISTANCE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;DANGER ZONE REACHED&quot;</span><span class="p">)</span>
+                <span class="n">reward</span> <span class="o">-=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DANGER_ZONE_DISTANCE</span> <span class="o">-</span> <span class="n">distance_to_monster</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
 
         <span class="c1"># Penalize stagnant behavior</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_pos</span><span class="p">,</span> <span class="n">old_pos</span><span class="p">):</span>
-            <span class="n">reward</span> <span class="o">+=</span> <span class="n">STAGNATION_PENALTY</span>
+            <span class="n">reward</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STAGNATION_PENALTY</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_distance_to_treasure</span> <span class="o">=</span> <span class="n">distance_to_treasure</span>
         <span class="k">return</span> <span class="n">reward</span></div>

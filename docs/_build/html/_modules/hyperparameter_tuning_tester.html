@@ -74,17 +74,10 @@
 <span></span><span class="kn">from</span> <span class="nn">logger_setup</span> <span class="kn">import</span> <span class="n">setup_logger</span>
 <span class="kn">from</span> <span class="nn">game_env</span> <span class="kn">import</span> <span class="n">GameEnvironment</span>
 <span class="kn">from</span> <span class="nn">stable_baselines3</span> <span class="kn">import</span> <span class="n">DQN</span>
+<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
 
-<span class="c1"># Determine the current working directory and set up directories for metrics, logs, and models.</span>
-<span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
-<span class="n">metrics_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;metrices&quot;</span><span class="p">)</span>
-<span class="n">logs_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span>
-<span class="n">models_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;models&quot;</span><span class="p">)</span>
-<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">models_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">logs_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">metrics_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <div class="viewcode-block" id="HyperParamTester">
 <a class="viewcode-back" href="../hyperparameter_tuning_tester.html#hyperparameter_tuning_tester.HyperParamTester">[docs]</a>
@@ -93,16 +86,25 @@
 <span class="sd">    A class for testing multiple hyperparameter configurations for a DQN model </span>
 <span class="sd">    in a custom game environment.</span>
 
-<span class="sd">    Attributes:</span>
+<span class="sd">       Attributes:</span>
 <span class="sd">        hyperparameter_configs (list): List of hyperparameter configurations.</span>
 <span class="sd">        total_timesteps (int): Total number of timesteps for training.</span>
 <span class="sd">        total_episodes (int): Total number of episodes for testing.</span>
 <span class="sd">        metrics (dict): Dictionary to store metrics for each configuration.</span>
 <span class="sd">        env (GameEnvironment): The game environment instance.</span>
 <span class="sd">        logger (Logger): Logger for logging training and testing activities.</span>
+
+<span class="sd">    Class Attributes:</span>
+<span class="sd">        metrics_dir (str): Directory for saving metrics.</span>
+<span class="sd">        logs_dir (str): Directory for saving logs.</span>
 <span class="sd">        models_dir (str): Directory for saving trained models.</span>
 <span class="sd">        metrics_path (str): Path for saving the metrics as a JSON file.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">metrics_dir</span> <span class="o">=</span> <span class="s2">&quot;metrices&quot;</span>
+    <span class="n">logs_dir</span> <span class="o">=</span> <span class="s2">&quot;logs&quot;</span>
+    <span class="n">models_dir</span> <span class="o">=</span> <span class="s2">&quot;models&quot;</span>
+    <span class="n">metrics_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metrics_dir</span><span class="p">,</span> <span class="s2">&quot;training_metrics.json&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperparameter_configs</span><span class="p">,</span> <span class="n">total_timesteps</span><span class="o">=</span><span class="mi">500000</span><span class="p">,</span> <span class="n">total_episodes</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -113,11 +115,9 @@
 <span class="sd">            total_timesteps (int): Total timesteps for training. Defaults to 500000.</span>
 <span class="sd">            total_episodes (int): Total episodes for testing. Defaults to 100.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">setup_logger</span><span class="p">(</span><span class="s1">&#39;HyperParamTester&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;hyper_param_tester_log_path&#39;</span><span class="p">,</span> <span class="s1">&#39;logs/hyper_param_tester.log&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">setup_logger</span><span class="p">(</span><span class="s1">&#39;HyperParamTester&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;hyper_param_tester_log_path&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">logs_dir</span><span class="si">}</span><span class="s1">/hyper_param_tester.log&#39;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">GameEnvironment</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameter_configs</span> <span class="o">=</span> <span class="n">hyperparameter_configs</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">models_dir</span> <span class="o">=</span> <span class="n">models_dir</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metrics_dir</span><span class="p">,</span> <span class="s2">&quot;training_metrics.json&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span> <span class="o">=</span> <span class="n">total_episodes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">total_timesteps</span> <span class="o">=</span> <span class="n">total_timesteps</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;config_id&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;total_reward&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;success_rate&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;average_episode_length&quot;</span><span class="p">:</span> <span class="p">[]}</span>
@@ -135,33 +135,30 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            DQN: The trained DQN model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="c1"># Initialize the RL model with the provided hyperparameters</span>
-            <span class="n">model</span> <span class="o">=</span> <span class="n">DQN</span><span class="p">(</span>
-                <span class="s2">&quot;MlpPolicy&quot;</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span>
-                <span class="n">learning_rate</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;learning_rate&quot;</span><span class="p">],</span>
-                <span class="n">gamma</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;gamma&quot;</span><span class="p">],</span>
-                <span class="n">exploration_initial_eps</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;exploration_initial_eps&quot;</span><span class="p">],</span>
-                <span class="n">exploration_final_eps</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;exploration_final_eps&quot;</span><span class="p">],</span>
-                <span class="n">exploration_fraction</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;exploration_fraction&quot;</span><span class="p">],</span>
-                <span class="n">buffer_size</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;buffer_size&quot;</span><span class="p">],</span>
-                <span class="n">batch_size</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">],</span>
-                <span class="n">target_update_interval</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;target_update_interval&quot;</span><span class="p">],</span>
-                <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span>
-            <span class="p">)</span>
+        <span class="c1"># Initialize the RL model with the provided hyperparameters</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">DQN</span><span class="p">(</span>
+            <span class="s2">&quot;MlpPolicy&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span>
+            <span class="n">learning_rate</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;learning_rate&quot;</span><span class="p">],</span>
+            <span class="n">gamma</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;gamma&quot;</span><span class="p">],</span>
+            <span class="n">exploration_initial_eps</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;exploration_initial_eps&quot;</span><span class="p">],</span>
+            <span class="n">exploration_final_eps</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;exploration_final_eps&quot;</span><span class="p">],</span>
+            <span class="n">exploration_fraction</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;exploration_fraction&quot;</span><span class="p">],</span>
+            <span class="n">buffer_size</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;buffer_size&quot;</span><span class="p">],</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">],</span>
+            <span class="n">target_update_interval</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;target_update_interval&quot;</span><span class="p">],</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training model </span><span class="si">{</span><span class="n">config_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
-            <span class="n">model</span><span class="o">.</span><span class="n">learn</span><span class="p">(</span><span class="n">total_timesteps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">total_timesteps</span><span class="p">)</span>
-            <span class="n">model_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;dqn_treasure_hunter_config_</span><span class="si">{</span><span class="n">config_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">.zip&quot;</span><span class="p">)</span>
-            
-            <span class="c1"># Save the trained model</span>
-            <span class="n">model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model_file_name</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model saved to </span><span class="si">{</span><span class="n">model_file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">model</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during training for configuration </span><span class="si">{</span><span class="n">config_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">raise</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training model </span><span class="si">{</span><span class="n">config_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">learn</span><span class="p">(</span><span class="n">total_timesteps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">total_timesteps</span><span class="p">)</span>
+        <span class="n">model_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;dqn_treasure_hunter_config_</span><span class="si">{</span><span class="n">config_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">.zip&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Save the trained model</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model_file_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model saved to </span><span class="si">{</span><span class="n">model_file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">model</span></div>
+
 
 
 <div class="viewcode-block" id="HyperParamTester.test_model">
@@ -177,43 +174,40 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting testing with configuration </span><span class="si">{</span><span class="n">config_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">total_reward</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">success_count</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">sum_episode_length</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting testing with configuration </span><span class="si">{</span><span class="n">config_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">total_reward</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">success_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">sum_episode_length</span> <span class="o">=</span> <span class="mi">0</span>
 
-            <span class="k">for</span> <span class="n">episode</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span><span class="p">):</span>
-                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-                <span class="n">episode_reward</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="n">episode_length</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">episode</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span><span class="p">):</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+            <span class="n">episode_reward</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">episode_length</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
 
-                <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
-                    <span class="n">action</span><span class="p">,</span> <span class="n">_states</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-                    <span class="n">state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
-                    <span class="n">episode_reward</span> <span class="o">+=</span> <span class="n">reward</span>
-                    <span class="n">episode_length</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+                <span class="n">action</span><span class="p">,</span> <span class="n">_states</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                <span class="n">state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+                <span class="n">episode_reward</span> <span class="o">+=</span> <span class="n">reward</span>
+                <span class="n">episode_length</span> <span class="o">+=</span> <span class="mi">1</span>
 
-                <span class="n">total_reward</span> <span class="o">+=</span> <span class="n">episode_reward</span>
-                <span class="n">sum_episode_length</span> <span class="o">+=</span> <span class="n">episode_length</span>
-                <span class="k">if</span> <span class="n">reward</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Success if the agent reached the treasure</span>
-                    <span class="n">success_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">total_reward</span> <span class="o">+=</span> <span class="n">episode_reward</span>
+            <span class="n">sum_episode_length</span> <span class="o">+=</span> <span class="n">episode_length</span>
+            <span class="k">if</span> <span class="n">reward</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Success if the agent reached the treasure</span>
+                <span class="n">success_count</span> <span class="o">+=</span> <span class="mi">1</span>
 
-            <span class="n">avg_reward</span> <span class="o">=</span> <span class="n">total_reward</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span>
-            <span class="n">avg_episode_length</span> <span class="o">=</span> <span class="n">sum_episode_length</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span>
-            <span class="n">success_rate</span> <span class="o">=</span> <span class="n">success_count</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span>
+        <span class="n">avg_reward</span> <span class="o">=</span> <span class="n">total_reward</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span>
+        <span class="n">avg_episode_length</span> <span class="o">=</span> <span class="n">sum_episode_length</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span>
+        <span class="n">success_rate</span> <span class="o">=</span> <span class="n">success_count</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuration </span><span class="si">{</span><span class="n">config_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">: Average Reward: </span><span class="si">{</span><span class="n">avg_reward</span><span class="si">}</span><span class="s2">, Success Rate: </span><span class="si">{</span><span class="n">success_rate</span><span class="si">}</span><span class="s2">, Average Episode Length: </span><span class="si">{</span><span class="n">avg_episode_length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuration </span><span class="si">{</span><span class="n">config_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">: Average Reward: </span><span class="si">{</span><span class="n">avg_reward</span><span class="si">}</span><span class="s2">, Success Rate: </span><span class="si">{</span><span class="n">success_rate</span><span class="si">}</span><span class="s2">, Average Episode Length: </span><span class="si">{</span><span class="n">avg_episode_length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-            <span class="c1"># Save metrics</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;config_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;total_reward&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_reward</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;success_rate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">success_rate</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;average_episode_length&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_episode_length</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during testing for configuration </span><span class="si">{</span><span class="n">config_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">raise</span></div>
+        <span class="c1"># Save metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;config_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;total_reward&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_reward</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;success_rate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">success_rate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;average_episode_length&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_episode_length</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="HyperParamTester.save_metrices">
@@ -241,16 +235,15 @@
 <span class="sd">        - Train the model.</span>
 <span class="sd">        - Test the model.</span>
 <span class="sd">        - Record the results.</span>
+
+<span class="sd">        Note: if hyper_param_tester_total_timesteps and hyper_param_tester_total_episodes are not defined in config.env</span>
+<span class="sd">        500000, and 100 respectively will be taken as default.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">config_count</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hyperparameter_configs</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting training with configuration </span><span class="si">{</span><span class="n">config_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">trained_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">config_count</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">test_model</span><span class="p">(</span><span class="n">trained_model</span><span class="p">,</span> <span class="n">config_count</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">save_metrices</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during execution: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">raise</span></div>
+        <span class="k">for</span> <span class="n">config_count</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hyperparameter_configs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting training with configuration </span><span class="si">{</span><span class="n">config_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">trained_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">config_count</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_model</span><span class="p">(</span><span class="n">trained_model</span><span class="p">,</span> <span class="n">config_count</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_metrices</span><span class="p">()</span></div>
 </div>
 
 
@@ -264,6 +257,7 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;hyperparameters.json&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">hyperparameter_configs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">load_dotenv</span><span class="p">(</span><span class="s2">&quot;config.env&quot;</span><span class="p">)</span>
         <span class="n">test</span> <span class="o">=</span> <span class="n">HyperParamTester</span><span class="p">(</span>
             <span class="n">hyperparameter_configs</span><span class="p">,</span>
             <span class="n">total_timesteps</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;hyper_param_tester_total_timesteps&#39;</span><span class="p">,</span> <span class="mi">500000</span><span class="p">)),</span>

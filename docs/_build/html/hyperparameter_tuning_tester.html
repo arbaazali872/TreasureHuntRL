@@ -47,14 +47,10 @@
 <li class="toctree-l1"><a class="reference internal" href="model_handler.html">Model Handler Module</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Hyperparameter Tester Module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester"><code class="docutils literal notranslate"><span class="pre">HyperParamTester</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.hyperparameter_configs"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.hyperparameter_configs</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.total_timesteps"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.total_timesteps</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.total_episodes"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.total_episodes</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.metrics"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.metrics</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.env"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.env</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.logger"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.logger</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.models_dir"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.models_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.logs_dir"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.logs_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.metrics_dir"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.metrics_dir</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.metrics_path"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.metrics_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.models_dir"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.models_dir</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.run"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.run()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.save_metrices"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.save_metrices()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#hyperparameter_tuning_tester.HyperParamTester.test_model"><code class="docutils literal notranslate"><span class="pre">HyperParamTester.test_model()</span></code></a></li>
@@ -97,93 +93,43 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class for testing multiple hyperparameter configurations for a DQN model
 in a custom game environment.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="hyperparameter_tuning_tester.HyperParamTester.hyperparameter_configs">
-<span class="sig-name descname"><span class="pre">hyperparameter_configs</span></span><a class="headerlink" href="#hyperparameter_tuning_tester.HyperParamTester.hyperparameter_configs" title="Link to this definition"></a></dt>
-<dd><p>List of hyperparameter configurations.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Attributes:</dt><dd><p>hyperparameter_configs (list): List of hyperparameter configurations.
+total_timesteps (int): Total number of timesteps for training.
+total_episodes (int): Total number of episodes for testing.
+metrics (dict): Dictionary to store metrics for each configuration.
+env (GameEnvironment): The game environment instance.
+logger (Logger): Logger for logging training and testing activities.</p>
 </dd>
 </dl>
-</dd></dl>
+</div></blockquote>
+<dl class="simple">
+<dt>Class Attributes:</dt><dd><p>metrics_dir (str): Directory for saving metrics.
+logs_dir (str): Directory for saving logs.
+models_dir (str): Directory for saving trained models.
+metrics_path (str): Path for saving the metrics as a JSON file.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hyperparameter_tuning_tester.HyperParamTester.logs_dir">
+<span class="sig-name descname"><span class="pre">logs_dir</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'logs'</span></em><a class="headerlink" href="#hyperparameter_tuning_tester.HyperParamTester.logs_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="hyperparameter_tuning_tester.HyperParamTester.total_timesteps">
-<span class="sig-name descname"><span class="pre">total_timesteps</span></span><a class="headerlink" href="#hyperparameter_tuning_tester.HyperParamTester.total_timesteps" title="Link to this definition"></a></dt>
-<dd><p>Total number of timesteps for training.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="hyperparameter_tuning_tester.HyperParamTester.total_episodes">
-<span class="sig-name descname"><span class="pre">total_episodes</span></span><a class="headerlink" href="#hyperparameter_tuning_tester.HyperParamTester.total_episodes" title="Link to this definition"></a></dt>
-<dd><p>Total number of episodes for testing.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="hyperparameter_tuning_tester.HyperParamTester.metrics">
-<span class="sig-name descname"><span class="pre">metrics</span></span><a class="headerlink" href="#hyperparameter_tuning_tester.HyperParamTester.metrics" title="Link to this definition"></a></dt>
-<dd><p>Dictionary to store metrics for each configuration.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="hyperparameter_tuning_tester.HyperParamTester.env">
-<span class="sig-name descname"><span class="pre">env</span></span><a class="headerlink" href="#hyperparameter_tuning_tester.HyperParamTester.env" title="Link to this definition"></a></dt>
-<dd><p>The game environment instance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="game_env.html#game_env.GameEnvironment" title="game_env.GameEnvironment">GameEnvironment</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="hyperparameter_tuning_tester.HyperParamTester.logger">
-<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#hyperparameter_tuning_tester.HyperParamTester.logger" title="Link to this definition"></a></dt>
-<dd><p>Logger for logging training and testing activities.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Logger</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="hyperparameter_tuning_tester.HyperParamTester.models_dir">
-<span class="sig-name descname"><span class="pre">models_dir</span></span><a class="headerlink" href="#hyperparameter_tuning_tester.HyperParamTester.models_dir" title="Link to this definition"></a></dt>
-<dd><p>Directory for saving trained models.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object py" id="hyperparameter_tuning_tester.HyperParamTester.metrics_dir">
+<span class="sig-name descname"><span class="pre">metrics_dir</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'metrices'</span></em><a class="headerlink" href="#hyperparameter_tuning_tester.HyperParamTester.metrics_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hyperparameter_tuning_tester.HyperParamTester.metrics_path">
-<span class="sig-name descname"><span class="pre">metrics_path</span></span><a class="headerlink" href="#hyperparameter_tuning_tester.HyperParamTester.metrics_path" title="Link to this definition"></a></dt>
-<dd><p>Path for saving the metrics as a JSON file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">metrics_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'metrices\\training_metrics.json'</span></em><a class="headerlink" href="#hyperparameter_tuning_tester.HyperParamTester.metrics_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hyperparameter_tuning_tester.HyperParamTester.models_dir">
+<span class="sig-name descname"><span class="pre">models_dir</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'models'</span></em><a class="headerlink" href="#hyperparameter_tuning_tester.HyperParamTester.models_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hyperparameter_tuning_tester.HyperParamTester.run">
@@ -193,6 +139,8 @@ in a custom game environment.</p>
 - Train the model.
 - Test the model.
 - Record the results.</p>
+<p>Note: if hyper_param_tester_total_timesteps and hyper_param_tester_total_episodes are not defined in config.env
+500000, and 100 respectively will be taken as default.</p>
 </dd></dl>
 
 <dl class="py method">

@@ -46,6 +46,12 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Game Environment Module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#game_env.GameEnvironment"><code class="docutils literal notranslate"><span class="pre">GameEnvironment</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#game_env.GameEnvironment.DANGER_ZONE_DISTANCE"><code class="docutils literal notranslate"><span class="pre">GameEnvironment.DANGER_ZONE_DISTANCE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game_env.GameEnvironment.LOSE_PENALTY"><code class="docutils literal notranslate"><span class="pre">GameEnvironment.LOSE_PENALTY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game_env.GameEnvironment.STAGNATION_PENALTY"><code class="docutils literal notranslate"><span class="pre">GameEnvironment.STAGNATION_PENALTY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game_env.GameEnvironment.STEP_PENALTY"><code class="docutils literal notranslate"><span class="pre">GameEnvironment.STEP_PENALTY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game_env.GameEnvironment.WIN_REWARD"><code class="docutils literal notranslate"><span class="pre">GameEnvironment.WIN_REWARD</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game_env.GameEnvironment._check_unique"><code class="docutils literal notranslate"><span class="pre">GameEnvironment._check_unique()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#game_env.GameEnvironment._compute_reward"><code class="docutils literal notranslate"><span class="pre">GameEnvironment._compute_reward()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#game_env.GameEnvironment._evaluate_game_state"><code class="docutils literal notranslate"><span class="pre">GameEnvironment._evaluate_game_state()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#game_env.GameEnvironment._generate_monsters"><code class="docutils literal notranslate"><span class="pre">GameEnvironment._generate_monsters()</span></code></a></li>
@@ -95,6 +101,37 @@
 <dt class="sig sig-object py" id="game_env.GameEnvironment">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">game_env.</span></span><span class="sig-name descname"><span class="pre">GameEnvironment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_agent_treasure_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_agent_monster_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game_env.html#GameEnvironment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game_env.GameEnvironment" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Env</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game_env.GameEnvironment.DANGER_ZONE_DISTANCE">
+<span class="sig-name descname"><span class="pre">DANGER_ZONE_DISTANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#game_env.GameEnvironment.DANGER_ZONE_DISTANCE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game_env.GameEnvironment.LOSE_PENALTY">
+<span class="sig-name descname"><span class="pre">LOSE_PENALTY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-20</span></em><a class="headerlink" href="#game_env.GameEnvironment.LOSE_PENALTY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game_env.GameEnvironment.STAGNATION_PENALTY">
+<span class="sig-name descname"><span class="pre">STAGNATION_PENALTY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-2</span></em><a class="headerlink" href="#game_env.GameEnvironment.STAGNATION_PENALTY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game_env.GameEnvironment.STEP_PENALTY">
+<span class="sig-name descname"><span class="pre">STEP_PENALTY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#game_env.GameEnvironment.STEP_PENALTY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game_env.GameEnvironment.WIN_REWARD">
+<span class="sig-name descname"><span class="pre">WIN_REWARD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">50</span></em><a class="headerlink" href="#game_env.GameEnvironment.WIN_REWARD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game_env.GameEnvironment._check_unique">
+<span class="sig-name descname"><span class="pre">_check_unique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monster_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monster_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game_env.html#GameEnvironment._check_unique"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game_env.GameEnvironment._check_unique" title="Link to this definition"></a></dt>
+<dd><p>Check if the monster’s position is unique compared to previous monsters.– Edge case handled</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="game_env.GameEnvironment._compute_reward">
 <span class="sig-name descname"><span class="pre">_compute_reward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_pos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/game_env.html#GameEnvironment._compute_reward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#game_env.GameEnvironment._compute_reward" title="Link to this definition"></a></dt>
