@@ -127,7 +127,7 @@ class GameEnvironment(gym.Env):
                 self.logger.warning(f"Monster {i} could not find a unique move after {max_retries} retries.")
 
     def _check_unique(self, monster_pos, monster_number):
-        """Check if the monster's position is unique compared to previous monsters."""
+        """Check if the monster's position is unique compared to previous monsters.-- Edge case handled"""
         for j in range(monster_number):
             if np.array_equal(self.monster_positions[j], monster_pos):
                 return False
@@ -182,6 +182,7 @@ class GameEnvironment(gym.Env):
         for monster_pos in self.monster_positions:
             distance_to_monster = self._manhattan_distance(self.agent_pos, monster_pos)
             if distance_to_monster < self.DANGER_ZONE_DISTANCE:
+                self.logger.info("DANGER ZONE REACHED")
                 reward -= (self.DANGER_ZONE_DISTANCE - distance_to_monster) * 2
 
         # Penalize stagnant behavior

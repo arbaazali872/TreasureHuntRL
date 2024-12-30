@@ -1,6 +1,7 @@
 from logger_setup import setup_logger
 from game_env import GameEnvironment
 from stable_baselines3 import DQN
+from dotenv import load_dotenv
 import os
 import json
 
@@ -23,6 +24,7 @@ class HyperParamTester:
         logs_dir (str): Directory for saving logs.
         models_dir (str): Directory for saving trained models.
         metrics_path (str): Path for saving the metrics as a JSON file.
+
     """
     metrics_dir = "metrices"
     logs_dir = "logs"
@@ -147,6 +149,9 @@ class HyperParamTester:
         - Train the model.
         - Test the model.
         - Record the results.
+
+        Note: if hyper_param_tester_total_timesteps and hyper_param_tester_total_episodes are not defined in config.env
+        500000, and 100 respectively will be taken as default.
         """
         for config_count, config in enumerate(self.hyperparameter_configs):
             self.logger.info(f"Starting training with configuration {config_count + 1}: {config}")
@@ -164,6 +169,7 @@ if __name__ == "__main__":
     try:
         with open("hyperparameters.json", "r") as f:
             hyperparameter_configs = json.load(f)
+        load_dotenv("config.env")
         test = HyperParamTester(
             hyperparameter_configs,
             total_timesteps=int(os.getenv('hyper_param_tester_total_timesteps', 500000)),
