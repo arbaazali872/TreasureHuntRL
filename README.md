@@ -2,7 +2,21 @@
 
 ## Overview
 
-This project implements a reinforcement learning (RL) solution using the Q-Learning algorithm to navigate a 10x10 grid-based environment. The agent learns to reach a treasure while avoiding dynamic obstacles (monsters). The project employs the **Stable Baselines3** library for RL and adheres to object-oriented programming principles for clean and modular design.
+This project implements a reinforcement learning (RL) Agent using the Q-Learning algorithm to navigate a 10x10 grid-based environment. The agent learns to reach a treasure while avoiding dynamic obstacles (monsters). The project employs the **Stable Baselines3** library for RL and adheres to object-oriented programming principles for clean and modular design.
+
+The Agent was trained on multiple sets of diffrent hyperparameters and its performance was judged on the basis of the following parameters
+
+- Average reward
+- Success rate 
+- Average Steps
+
+The best results obtained after multiple tests episodes on models trained across diffrent hyperparameters were as follows
+
+| Metric           | Value |
+|-------------------|-------|
+| **Average Reward** | 13.54 |
+| **Success Rate**   | 76%   |
+| **Average Steps**  | 8.84  |
 
 
 ## Installation
@@ -71,3 +85,5 @@ Modify the hyperparameter values in the `hyperparameters.json` file before runni
 - Performance metrics are saved in the `metrices/` directory.
 
 **To read the whole project report containing training parameters and agent's performances [Click Here](https://drive.google.com/file/d/1p2NEh5vgCc4G6sPDBMinKrgSnWGy9SAP/view?usp=sharing)**
+
+**The documentation of the code can be found in the docs folder in the root directory of the project**
